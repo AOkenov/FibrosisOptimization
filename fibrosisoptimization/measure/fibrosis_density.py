@@ -7,17 +7,17 @@ class FibrosisDensity:
         pass
     
     @staticmethod
-    def compute_density(mesh, labels, as_map=False):
+    def compute_density(mesh, segments, as_map=False):
         '''
-        Computes density map for all labels
+        Computes density map for all segments
         '''
-        index = np.unique(labels[labels > 0])
-        out = ndimage.mean(mesh, labels, index=index)
+        index = np.unique(segments[segments > 0])
+        out = ndimage.mean(mesh, segments, index=index)
         out -= 1
 
         if as_map:
-            res = out[labels - 1]
-            res[labels == 0] = 0
+            res = out[segments - 1]
+            res[segments == 0] = 0
             return res
         
         return out

@@ -80,6 +80,6 @@ for i, label in enumerate(['(a)', '(b)', '(c)']):
     
 plt.tight_layout(pad=0.1, h_pad=0.1, w_pad=0.8)
 plt.subplots_adjust(top=0.98, bottom=0.3, right=0.98, left=0.1)
-fig.savefig(path_save.joinpath('lv_convergence.png'), dpi=300)
+# fig.savefig(path_save.joinpath('lv_convergence.png'), dpi=300)
 plt.show()
 
