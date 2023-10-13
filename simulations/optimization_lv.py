@@ -6,7 +6,7 @@ from fibrosisoptimization.measure.residual import Residual
 from fibrosisoptimization.measure.fibrosis_density import FibrosisDensity
 from fibrosisoptimization.minimization.minimizator import Minimizator
 
-path = Path('/Users/arstanbek/Hulk/Arstan/data')
+path = Path('./data')
 path_step = path.joinpath('LV')
 
 max_iter = 100

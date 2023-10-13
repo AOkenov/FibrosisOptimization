@@ -16,7 +16,7 @@ distant_segments = [[1, 3, 5, 14, 16],
 def sort_distant_segments(distant_segments, lats):
     out = []
     for s in distant_segments:
-        out.append(np.mean(np.abs(lats[np.array(s)-1])))
+        out.append(np.mean(np.abs(lats[np.array(s) - 1])))
 
     res = []
     for i in np.argsort(-np.array(out)):
@@ -33,13 +33,13 @@ def update_densities(minimizators, densities, lats):
     return np.array(out)
 
 
-path = Path('/Users/arstanbek/Hulk/Arstan/data')
+path = Path('./data')
 path_step = path.joinpath('17')
 
 max_iter = 100
 
 residual = Residual(path_step, 'epi', 13, fs=1 / (40 * 0.0015))
-segments = np.load(path_step.joinpath('segments.npy'))
+segments = np.load(path.joinpath('segments_17.npy'))
 
 residual.update_base('1')
 residual.update_target('0')
@@ -61,16 +61,16 @@ for i in range(4, 9):
 
     mesh = np.load(path_step.joinpath(subdir, 'tissue.npy'))
     densities = FibrosisDensity.compute_density(mesh, segments)
-    print(i, np.round(densities[active_segments-1], decimals=3))
+    print(i, np.round(densities[active_segments - 1], decimals=3))
 
     densities_next = update_densities(minimizators, densities, lats_mean)
 
-    print(i, np.round(lats_mean[active_segments-1], decimals=3))
-    print(i, np.round(densities_next[active_segments-1], decimals=3))
+    print(i, np.round(lats_mean[active_segments - 1], decimals=3))
+    print(i, np.round(densities_next[active_segments - 1], decimals=3))
 
     print()
 
-    mesh = generator.update(mesh, densities_next[active_segments-1],
+    mesh = generator.update(mesh, densities_next[active_segments - 1],
                             active_segments)
     # density_next = FibrosisDensity.compute_density(mesh, segments)
 
@@ -85,16 +85,15 @@ for i in range(4, 9):
 
         active_segments = distant_segments[distant_segments_ind]
         print(i, 'Next segments', active_segments)
-        print(i, np.round(lats_mean[active_segments-1], decimals=3))
-        print(i, np.round(densities_next[active_segments-1], decimals=3))
+        print(i, np.round(lats_mean[active_segments - 1], decimals=3))
+        print(i, np.round(densities_next[active_segments - 1], decimals=3))
 
-        mesh = generator.update(mesh, densities_next[active_segments-1],
+        mesh = generator.update(mesh, densities_next[active_segments - 1],
                                 active_segments)
 
     if np.all(np.abs(d_densities) < 0.01):
         print('Convergence achived')
         break
-
 
     # density_next = FibrosisDensity.compute_density(mesh, segments)
 

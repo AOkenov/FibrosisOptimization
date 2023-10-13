@@ -1,12 +1,27 @@
 import numpy as np
-from copy import deepcopy
 
 from fibrosisoptimization.core.surface_data import SurfaceData
 from fibrosisoptimization.measure.measurers import Measurer
 
 
 class DataUpdater:
+
+    """Class for updating data
+
+    Attributes:
+        data (SurfaceData): Description
+        lat_reference (float): Reference time used for measuring LAT
+        fs (float): Sampling rate
+    """
+
     def __init__(self, coords, lat_reference, fs):
+        """Initialize
+
+        Args:
+            coords (np.ndarray): Coords of the points
+            lat_reference (float): Reference time used for measuring LAT
+            fs (float): Sampling rate
+        """
         self.lat_reference = lat_reference
         self.fs = fs
 
@@ -16,6 +31,14 @@ class DataUpdater:
         self.data.lat = np.zeros(len(coords))
 
     def update(self, egms):
+        """Update data object and return new data object
+
+        Args:
+            egms (np.ndarray): Array of the measured EGMs
+
+        Returns:
+            SurfaceData: Description
+        """
         ptp, lat = Measurer.evaluate(egms, self.lat_reference, self.fs)
         out = self.data.copy()
 

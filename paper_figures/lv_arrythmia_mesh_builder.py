@@ -3,8 +3,8 @@ import numpy as np
 from fibropt.vtktools.vtk_mesh_builder import VTKMeshBuilder
 
 
-path = Path('/Users/arstanbek/Thor/projects/fibrosisoptimization/data')
-path_save = Path('/Users/arstanbek/Projects/fibrosis-workspace/fibrosisoptimization/data/vtk/')
+path = Path('./data')
+path_save = Path('./data/vtk/')
 experiment = 'odf_frames'
 subdirs = ['initial']
 frame_inds = list(range(30))

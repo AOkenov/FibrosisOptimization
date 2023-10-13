@@ -24,35 +24,35 @@ class SurfaceData:
         ptp = self.ptp + y.ptp
         lat = self.lat + y.lat
         return SurfaceData(self.coords, self.segments, self.indices, ptp, lat)
-    
+
     def __sub__(self, y):
         ptp = self.ptp - y.ptp
         lat = self.lat - y.lat
         return SurfaceData(self.coords, self.segments, self.indices, ptp, lat)
-    
+
     def __mul__(self, y):
         ptp = self.ptp * y.ptp
         lat = self.lat * y.lat
         return SurfaceData(self.coords, self.segments, self.indices, ptp, lat)
-    
+
     def __truediv__(self, y):
         ptp = self.ptp / y.ptp
         lat = self.lat / y.lat
         return SurfaceData(self.coords, self.segments, self.indices, ptp, lat)
-    
+
     def __pow__(self, n):
         ptp = self.ptp ** n
         lat = self.lat ** n
         return SurfaceData(self.coords, self.segments, self.indices, ptp, lat)
-    
+
     def abs(self):
         self.lat = np.abs(self.lat)
         self.ptp = np.abs(self.ptp)
         return self
-    
+
     def copy(self):
         return SurfaceData(self.coords, self.segments, self.indices)
-    
+
     @property
     def lat_mean_per_segment(self):
         return ndimage.mean(self.lat, self.segments, self.indices)
