@@ -26,15 +26,22 @@ class Measurer:
         '''
         Measure amplitude and LAT of signals
 
-        Args:
-            signals (np.ndarray[M, N]): M EGMs with length N
-            lat_reference (float): Reference value for measuring LAT -
-                                   stimulation time (time units)
-            fs (float): Sampling frequency (1 / time units)
+        Parameters
+        ----------
+        signals : np.ndarray[M, N]
+            M EGMs with length N
+        lat_reference : float
+            Reference value for measuring LAT -
+            stimulation time (time units)
+        fs : float
+            Sampling frequency (1 / time units)
 
-        Returns:
-            np.ndarray[M]: Amplitudes
-            np.ndarray[M]: LATs
+        Returns
+        -------
+        np.ndarray[M]
+            Amplitudes
+        np.ndarray[M]
+            LATs
         '''
         amplitude = AmplitudeMeasurer().evaluate(signals)
         lat = 1 / fs * ActivationTimesMeasurer(lat_reference).evaluate(signals)

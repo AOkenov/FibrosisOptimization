@@ -8,36 +8,50 @@ class DataUpdater:
 
     """Class for updating data
 
-    Attributes:
-        data (SurfaceData): Description
-        lat_reference (float): Reference time used for measuring LAT
-        fs (float): Sampling rate
+    Attributes
+    ----------
+    data : SurfaceData
+        Description
+    fs : float
+        Sampling rate
+    lat_reference : float
+        Reference time used for measuring LAT
     """
 
-    def __init__(self, coords, lat_reference, fs):
+    def __init__(self, coords, lat_reference, fs, segments=None):
         """Initialize
 
-        Args:
-            coords (np.ndarray): Coords of the points
-            lat_reference (float): Reference time used for measuring LAT
-            fs (float): Sampling rate
+        Parameters
+        ----------
+        coords : np.ndarray
+            Coords of the points
+        lat_reference : float
+            Reference time used for measuring LAT
+        fs : float
+            Sampling rate
         """
         self.lat_reference = lat_reference
         self.fs = fs
 
         self.data = SurfaceData()
         self.data.coords = coords
+        self.data.segments = segments
+        self.data.indices = np.unique(segments[segments > 0])
         self.data.ptp = np.zeros(len(coords))
         self.data.lat = np.zeros(len(coords))
 
     def update(self, egms):
         """Update data object and return new data object
 
-        Args:
-            egms (np.ndarray): Array of the measured EGMs
+        Parameters
+        ----------
+        egms : np.ndarray
+            Array of the measured EGMs
 
-        Returns:
-            SurfaceData: Description
+        Returns
+        -------
+        SurfaceData
+            Description
         """
         ptp, lat = Measurer.evaluate(egms, self.lat_reference, self.fs)
         out = self.data.copy()

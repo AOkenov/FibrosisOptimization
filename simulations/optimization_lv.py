@@ -2,43 +2,45 @@ from pathlib import Path
 import numpy as np
 
 from fibrosisoptimization.core.fibrosis_generator import FibrosisGenerator
-from fibrosisoptimization.measure.residual import Residual
+from fibrosisoptimization.measure.residuals import Residuals
 from fibrosisoptimization.measure.fibrosis_density import FibrosisDensity
-from fibrosisoptimization.minimization.minimizator import Minimizator
+from fibrosisoptimization.minimizators import (
+    MinimizatorsCollection
+)
+
 
 path = Path('./data')
 path_step = path.joinpath('LV')
 
-max_iter = 100
+max_iter = 10
+segments_list = [1]
 
-residual = Residual(path_step, 'epi', 13, fs=1 / (40 * 0.0015))
+residuals = Residuals(path_step, 'epi', 13, fs=1 / (40 * 0.0015))
 segments = np.load(path_step.joinpath('segments.npy'))
 
-residual.update_base('1')
-residual.update_target('0')
+residuals.update_base('1')
+residuals.update_target('0')
 
-minimizator = Minimizator('LV', 'LAT')
+minimizators = MinimizatorsCollection(segments_list, ['LAT'])
+
 generator = FibrosisGenerator(segments)
 
 for i in range(1, max_iter):
+    print('--------------------------------------------')
+    print('ITERATION: {}'.format(i))
     subdir = '{}'.format(i)
-    data = residual.update(subdir)
-    lat_mean = - data.lat_mean_per_segment[0]
+    data = residuals.update(subdir)
 
     mesh = np.load(path_step.joinpath(subdir, 'tissue.npy'))
-    density = FibrosisDensity.compute_density(mesh, segments)[0]
+    densities = FibrosisDensity.compute_density(mesh, segments)
 
-    density_next = minimizator.update(density, lat_mean)
+    densities_next = minimizators.update(densities, data)
 
-    mesh = generator.update(mesh, [density_next], [1])
-    density_next = FibrosisDensity.compute_density(mesh, segments)[0]
-
-    print(i, ': ', '{:.3f}'.format(lat_mean), '{:.2f}'.format(density), "-->",
-          '{:.2f}'.format(density_next))
-
-    if np.abs(density_next - density) < 0.01:
-        print('Convergence achived')
+    if np.all(np.abs(densities_next - densities) < 0.01):
+        print('CONVERGENCE ACHIVED')
         break
+
+    mesh = generator.update(mesh, densities_next, segments)
 
     # subdir = '{}'.format(i + 1)
     # path_next = path_step.joinpath(subdir)

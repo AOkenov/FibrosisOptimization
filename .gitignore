@@ -1,4 +1,7 @@
 # Byte-compiled / optimized / DLL files
+LV/
+17/
+TEST/
 *.vtk
 .DS_Store
 __pycache__/
