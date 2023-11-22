@@ -9,7 +9,7 @@ class ActivationTimesMeasurer:
         return np.argmin(np.diff(signal, axis=1), axis=1) - self.reference
 
 
-class AmplitudeMeasurer:
+class PtPAmplitudeMeasurer:
     def __init__(self):
         pass
 
@@ -43,6 +43,6 @@ class Measurer:
         np.ndarray[M]
             LATs
         '''
-        amplitude = AmplitudeMeasurer().evaluate(signals)
+        amplitude = PtPAmplitudeMeasurer().evaluate(signals)
         lat = 1 / fs * ActivationTimesMeasurer(lat_reference).evaluate(signals)
         return amplitude, lat
