@@ -2,27 +2,44 @@ from pathlib import Path
 import numpy as np
 
 from fibrosisoptimization.core.fibrosis_generator import FibrosisGenerator
-from fibrosisoptimization.measure.residuals import Residuals
-from fibrosisoptimization.measure.fibrosis_density import FibrosisDensity
+from fibrosisoptimization.measure import (
+    Residuals,
+    DataLoader,
+    FibrosisMeasurer
+)
 from fibrosisoptimization.minimizators import (
-    MinimizatorsCollection
+    ParallelMinimizators
 )
 
+from simulations import run_simulation
 
-path = Path('./data')
-path_step = path.joinpath('LV')
 
+path = Path('./data/models')
+model_dir = 'left_ventricle'
+model_subdir = 'LV'
+data_path = path.joinpath(model_dir, model_subdir)
+
+surface_name = 'epi'
+lat_reference = 13
+fs = 1 / (40 * 0.0015)
 max_iter = 10
 segments_list = [1]
 
-residuals = Residuals(path_step, 'epi', 13, fs=1 / (40 * 0.0015))
-segments = np.load(path_step.joinpath('segments.npy'))
+data_loader = DataLoader(surface_name=surface_name,
+                         data_path=data_path,
+                         electrodes_path=data_path,
+                         segments_path=data_path,
+                         layers_path=path,
+                         stimul_path=path,
+                         fibers_path=path)
 
+residuals = Residuals(data_loader, lat_reference, fs, interpolate=True)
 residuals.update_base('1')
 residuals.update_target('0')
 
-minimizators = MinimizatorsCollection(segments_list, ['LAT'])
+minimizators = ParallelMinimizators(segments_list, ['LAT'])
 
+segments = data_loader.load_segments()
 generator = FibrosisGenerator(segments)
 
 for i in range(1, max_iter):
@@ -31,8 +48,8 @@ for i in range(1, max_iter):
     subdir = '{}'.format(i)
     data = residuals.update(subdir)
 
-    mesh = np.load(path_step.joinpath(subdir, 'tissue.npy'))
-    densities = FibrosisDensity.compute_density(mesh, segments)
+    mesh = data_loader.load_mesh(subdir)
+    densities = FibrosisMeasurer.compute_density(mesh, segments)
 
     densities_next = minimizators.update(densities, data)
 
@@ -42,8 +59,9 @@ for i in range(1, max_iter):
 
     mesh = generator.update(mesh, densities_next, segments)
 
-    # subdir = '{}'.format(i + 1)
-    # path_next = path_step.joinpath(subdir)
-    # path_next.mkdir(parents=True, exist_ok=True)
+    data_loaders = {'epi': data_loader}
+    subdir = '{}'.format(i + 1)
+    path_next = data_loaders['epi'].data_path.joinpath(subdir)
+    path_next.mkdir(parents=True, exist_ok=True)
     # np.save(path_next.joinpath('tissue.npy'), mesh.astype(np.uint8))
-    # run_simulation(path, path_step, subdir)
+    run_simulation(data_loaders, subdir, t_max=10, prog_bar=True)

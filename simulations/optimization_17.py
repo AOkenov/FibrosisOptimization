@@ -2,14 +2,19 @@ from pathlib import Path
 import numpy as np
 
 from fibrosisoptimization.core.fibrosis_generator import FibrosisGenerator
-from fibrosisoptimization.measure.residuals import Residuals
-from fibrosisoptimization.measure.fibrosis_density import FibrosisDensity
+from fibrosisoptimization.measure import (
+    Residuals,
+    DataLoader,
+    FibrosisMeasurer
+)
 from fibrosisoptimization.minimizators import (
-    MinimizatorsCollection
+    ParallelMinimizators
 )
 
 
 def sort_distant_segments(lats):
+    """Sort group of segments based on mean error
+    """
     distant_segments = [[1, 3, 5, 14, 16],
                         [2, 4, 6, 13, 15],
                         [7, 9, 11],
@@ -25,16 +30,26 @@ def sort_distant_segments(lats):
     return res
 
 
-path = Path('./data')
-path_step = path.joinpath('17')
+path = Path('./data/models')
+model_dir = 'left_ventricle'
+model_subdir = '17'
+data_path = path.joinpath(model_dir, model_subdir)
+
+surface_name = 'epi'
+lat_reference = 13
+fs = 1 / (40 * 0.0015)
 
 max_iter = 18
 start_iter = 4
 segments_list = [1]
 
-residuals = Residuals(path_step, 'epi', 13, fs=1 / (40 * 0.0015))
-segments = np.load(path_step.joinpath('segments.npy'))
+data_loader = DataLoader(surface_name=surface_name,
+                         data_path=data_path,
+                         electrodes_path=data_path,
+                         segments_path=data_path,
+                         layers_path=path)
 
+residuals = Residuals(data_loader, lat_reference, fs, interpolate=True)
 residuals.update_base('1')
 residuals.update_target('0')
 
@@ -43,16 +58,14 @@ data = residuals.update('4')
 lats_mean = - data.lat_mean_per_segment
 distant_segments = sort_distant_segments(lats_mean)
 
-print(distant_segments)
-
 full_segments_list = np.concatenate(distant_segments)
 
-print(full_segments_list)
+segments = data_loader.load_segments()
 
 for segments_list in distant_segments:
 
-    minimizators = MinimizatorsCollection(segments_list,
-                                          ['LAT'] * len(segments_list))
+    minimizators = ParallelMinimizators(segments_list,
+                                        ['LAT'] * len(segments_list))
 
     generator = FibrosisGenerator(segments)
 
@@ -67,9 +80,9 @@ for segments_list in distant_segments:
         subdir = '{}'.format(i)
         data = residuals.update(subdir)
 
-        mesh = np.load(path_step.joinpath(subdir, 'tissue.npy'))
+        mesh = data_loader.load_mesh(subdir)
 
-        densities = FibrosisDensity.compute_density(mesh, segments)
+        densities = FibrosisMeasurer.compute_density(mesh, segments)
 
         print(densities[full_segments_list - 1])
 

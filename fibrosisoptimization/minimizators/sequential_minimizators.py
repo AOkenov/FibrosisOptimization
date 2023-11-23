@@ -1,9 +1,11 @@
 import numpy as np
-from fibrosisoptimization.minimizators.minimizator import Minimizator
+from fibrosisoptimization.minimizators.minimizator_collection import (
+    MinimizatorCollection
+)
 
 
-class LocalMinimizatorsCollection:
-    """LocalMinimizatorsCollection class for managing endo, mid, and epi
+class SequentialMinimizators(MinimizatorCollection):
+    """SequentialMinimizators class for managing endo, mid, and epi
     segments minimizators.
 
     This class manages a collection of Minimizator instances for
@@ -54,61 +56,16 @@ class LocalMinimizatorsCollection:
         max_switch_number : int, optional
             Maximum switch count. Defaults to 9.
         """
+        super().__init__(segments, value_names, density_step_tol)
         self.number_of_segments = number_of_segments
-        self.density_step_tol = density_step_tol
         self.max_switch_number = max_switch_number
-        self.minimizators = self.make_minimizators(segments, value_names)
 
         self.active_minimizator = None
         self.switch_counter = 0
 
         self.switch_minimizator()
 
-    @property
-    def segments(self):
-        """Get segment information for all Minimizator instances.
-
-        Returns
-        -------
-        list
-            List of segment information for each Minimizator.
-        """
-        return np.array(
-            [minimizator.segment for minimizator in self.minimizators])
-
-    @property
-    def value_names(self):
-        """Get value names for all Minimizator instances.
-
-        Returns
-        -------
-        list
-            List of value names for each Minimizator.
-        """
-        return np.array(
-            [minimizator.value_name for minimizator in self.minimizators])
-
-    def make_minimizators(self, segments, value_names):
-        """Create Minimizator instances based on segment and value names.
-
-        Parameters
-        ----------
-        segments : list
-            List of segment information.
-        value_names : list
-            List of value names.
-
-        Returns
-        -------
-        list
-            List of Minimizator instances.
-        """
-        minimizators = []
-        for segment, value_name in zip(segments, value_names):
-            minimizators.append(Minimizator(segment, value_name))
-        return minimizators
-
-    def _update(self, densities, surface_data_endo, surface_data_epi):
+    def _update(self, densities, surface_data):
         """Internal method to update Minimizator based on densities and
         surface data.
 
@@ -116,10 +73,8 @@ class LocalMinimizatorsCollection:
         ----------
         densities : list
             List of density values.
-        surface_data_endo : SurfaceData
-            Endocardial surface data object.
-        surface_data_epi: SurfaceData
-            Epicardial surface data object.
+        surface_data : dict
+            Endo- and epicardial surface data.
 
         Returns
         -------
@@ -127,13 +82,13 @@ class LocalMinimizatorsCollection:
             Tuple of active minimizator density and new density value.
         """
         if self.active_minimizator.value_name == 'PtP_ENDO':
-            values = surface_data_endo.ptp_mean_per_segment
+            values = surface_data['endo'].ptp_mean_per_segment
 
         if self.active_minimizator.value_name == 'PtP_EPI':
-            values = surface_data_epi.ptp_mean_per_segment
+            values = surface_data['epi'].ptp_mean_per_segment
 
         if self.active_minimizator.value_name == 'LAT':
-            values = -surface_data_epi.lat_mean_per_segment
+            values = -surface_data['epi'].lat_mean_per_segment
 
         segment_ind = self.active_minimizator.segment - 1
         value = values[segment_ind % self.number_of_segments]
@@ -148,17 +103,15 @@ class LocalMinimizatorsCollection:
 
         return density, density_new
 
-    def update(self, densities, surface_data_endo, surface_data_epi):
+    def update(self, densities, surface_data):
         """Update Minimizators based on densities and surface data.
 
         Parameters
         ----------
         densities : list
             List of density values.
-        surface_data_endo : SurfaceData
-            Endocardial surface data object.
-        surface_data_epi: SurfaceData
-            Epicardial surface data object.
+        surface_data : dict
+            Endo- and epicardial surface data object
 
         Returns
         -------
@@ -169,8 +122,7 @@ class LocalMinimizatorsCollection:
         densities = densities.copy()
 
         while self.switch_counter <= self.max_switch_number:
-            density, density_new = self._update(densities, surface_data_endo,
-                                                surface_data_epi)
+            density, density_new = self._update(densities, surface_data)
 
             if abs(density_new - density) < self.density_step_tol:
                 self.switch_minimizator()

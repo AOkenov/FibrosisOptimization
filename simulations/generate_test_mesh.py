@@ -21,5 +21,5 @@ fibrosis_generator = FibrosisGenerator(segment_12)
 
 for name, densities in densities.items():
     tissue = fibrosis_generator.update(mesh.copy(), densities, [1, 2, 3])
-    np.save(path.joinpath('test_models/meshes', '{}.npy'.format(name)),
-            tissue.astype('uint8'))
+    # np.save(path.joinpath('test_models/meshes', '{}.npy'.format(name)),
+    #         tissue.astype('uint8'))

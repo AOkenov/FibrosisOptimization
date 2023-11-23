@@ -14,13 +14,12 @@ from finitewave.core.tracker.tracker_sequence import TrackerSequence
 from finitewave.cpuwave3D.tracker.ecg_3d_tracker import ECG3DTracker
 
 
-def run_simulation(path, path_exp, subdir, t_max, prog_bar=False):
-    fibers = np.load(path.joinpath('fibers.npy'))
-    stimul_coords = np.load(path_exp.joinpath('stimul_coords.npy'))
-    electrodes = {}
-    electrodes['endo'] = np.load(path_exp.joinpath('electrodes_endo.npy'))
-    electrodes['epi'] = np.load(path_exp.joinpath('electrodes_epi.npy'))
-    mesh = np.load(path_exp.joinpath(subdir, 'tissue.npy'))
+def run_simulation(data_loaders, subdir, t_max, sampling_rate=40,
+                   prog_bar=False):
+    path_save = data_loaders['epi'].data_path
+    fibers = data_loaders['epi'].load_fibers()
+    stimul_coords = data_loaders['epi'].load_stimul_coords()
+    mesh = data_loaders['epi'].load_mesh()
 
     tissue = CardiacTissue3D(mesh.shape)
     tissue.mesh = mesh
@@ -47,11 +46,12 @@ def run_simulation(path, path_exp, subdir, t_max, prog_bar=False):
     tracker_sequence = TrackerSequence()
 
     egm_tracker = {}
-    for k, v in electrodes.items():
-        egm_tracker[k] = ECG3DTracker(memory_save=True)
-        egm_tracker[k].step = 40
-        egm_tracker[k].measure_coords = v
-        tracker_sequence.add_tracker(egm_tracker[k])
+    for surf_name, data_loader in data_loaders.items():
+        electrodes = data_loader.load_electrodes()[:, :3]
+        egm_tracker[surf_name] = ECG3DTracker(memory_save=True)
+        egm_tracker[surf_name].step = sampling_rate
+        egm_tracker[surf_name].measure_coords = electrodes
+        tracker_sequence.add_tracker(egm_tracker[surf_name])
 
     model.cardiac_tissue = tissue
     model.stim_sequence = stim_sequence
@@ -60,5 +60,5 @@ def run_simulation(path, path_exp, subdir, t_max, prog_bar=False):
     model.run()
 
     for surf_name, tracker in egm_tracker.items():
-        np.save(path.joinpath(subdir, 'egm_{}.npy'.format(surf_name)),
+        np.save(path_save.joinpath(subdir, 'egm_{}.npy'.format(surf_name)),
                 tracker.ecg.astype(np.float32))

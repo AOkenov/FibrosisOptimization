@@ -2,7 +2,7 @@ import numpy as np
 from scipy import ndimage
 
 
-class DensityMeasurer:
+class FibrosisMeasurer:
     """Fibrosis density calculation module"""
 
     def __init__(self) -> None:
@@ -24,7 +24,7 @@ class DensityMeasurer:
         np.ndarray
             Density map computed for the segments.
         """
-        density_list = DensityMeasurer.compute_density(mesh, segments)
+        density_list = FibrosisMeasurer.compute_density(mesh, segments)
         density_map = density_list[segments - 1]
         density_map[segments == 0] = 0
         return density_map

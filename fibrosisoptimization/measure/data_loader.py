@@ -3,12 +3,15 @@ import numpy as np
 
 class DataLoader:
     def __init__(self, surface_name=None, data_path=None, electrodes_path=None,
-                 segments_path=None, layers_path=None):
+                 segments_path=None, layers_path=None, stimul_path=None,
+                 fibers_path=None):
         self.surface_name = surface_name
         self.data_path = data_path
         self.electrodes_path = electrodes_path
         self.segments_path = segments_path
         self.layers_path = layers_path
+        self.stimul_path = stimul_path
+        self.fibers_path = fibers_path
 
     def load_electrodes(self):
         """Load electrode coordinates and segment labels
@@ -79,3 +82,9 @@ class DataLoader:
     def load_mesh(self, subdir):
         mesh = np.load(self.data_path.joinpath(subdir, 'tissue.npy'))
         return mesh
+
+    def load_fibers(self):
+        return np.load(self.fibers_path.joinpath('fibers.npy'))
+
+    def load_stimul_coords(self):
+        return np.load(self.stimul_path.joinpath('stimul_coords.npy'))
