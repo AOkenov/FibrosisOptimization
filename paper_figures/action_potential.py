@@ -16,8 +16,10 @@ mpl.rcParams['axes.titlesize'] = 'medium'
 mpl.rcParams['xtick.minor.size'] = 1
 mpl.rcParams['ytick.minor.size'] = 1
 
-font_properties = {'family': 'serif', 'color': 'black',
-                   'weight': 'normal', 'size': 12}
+font_properties = {'family': 'serif', 
+                   'color': 'black',
+                   'weight': 'normal', 
+                   'size': 12}
 
 path = Path('./data')
 path_save = Path('./data/figures')
@@ -54,4 +56,4 @@ plt.tight_layout()
 # print(peaks)
 plt.show()
 
-fig.savefig(path_save.joinpath('action_potentials.png'), dpi=300)
+# fig.savefig(path_save.joinpath('action_potentials.png'), dpi=300)

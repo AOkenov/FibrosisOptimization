@@ -86,5 +86,4 @@ class DataInterpolator:
         w = np.zeros_like(d)
         _ = np.divide(np.maximum(0, r - d), (r * d), where=d != 0, out=w) ** 2
         w[d == 0] = 1
-        print(d.min())
         return w

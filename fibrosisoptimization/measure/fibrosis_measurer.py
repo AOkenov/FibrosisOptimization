@@ -25,7 +25,7 @@ class FibrosisMeasurer:
             Density map computed for the segments.
         """
         density_list = FibrosisMeasurer.compute_density(mesh, segments)
-        density_map = density_list[segments - 1]
+        density_map = density_list[segments.astype(int) - 1]
         density_map[segments == 0] = 0
         return density_map
 

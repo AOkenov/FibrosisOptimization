@@ -61,6 +61,24 @@ class InteractivePlotter(pv.Plotter):
         self.grid.cell_data[name] = scalar[self.scalar_idx]
         self.grid.set_active_scalars(name)
 
+    def add_sphere_points(self, coords, scalars, cmap='viridis'):
+        """Add points to the plotter.
+
+        Args:
+            coords (numpy.ndarray): Coordinates of the points.
+            scalars (numpy.ndarray): Scalar values of the points.
+            cmap (str, optional): Color map name. Defaults to 'viridis'.
+        """
+        self.add_points(
+            coords.astype(float),
+            render_points_as_spheres=True,
+            # style='points_gaussian',
+            scalars=scalars,
+            point_size=10,
+            show_scalar_bar=False,
+            cmap=cmap
+        )
+
     def update_scalar(self, scalar):
         """Update the scalar values on the grid.
 

@@ -1,10 +1,11 @@
 from pathlib import Path
-import copy
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from fibropt.measure.electrodes_data_updater import ElectrodesDataUpdater
+from fibrosisoptimization.measure.data_loader import DataLoader
+from fibrosisoptimization.measure.residuals import Residuals
+from fibrosisoptimization.core.surface_data import SurfaceData
 
 
 mpl.rcParams['axes.linewidth'] = 0.5
@@ -17,30 +18,41 @@ mpl.rcParams['xtick.minor.size'] = 1
 mpl.rcParams['ytick.minor.size'] = 1
 
 
-font_properties = {'family': 'serif', 'color':  'black', 'weight': 'normal', 'size': 12}
+font_properties = {'family': 'serif',
+                   'color': 'black',
+                   'weight': 'normal',
+                   'size': 12}
 
-path_save = Path('/Users/arstanbek/Projects/fibrosis-workspace/fibrosisoptimization/data/figures')
-path = Path('/Users/arstanbek/Hulk/Arstan/optimization/data/real-like')
-experiment = 'exp_old'
-subdir = 202
+path = Path('/Users/arstanbek/Projects/FibrosisOptimization/data')
+path_save = path.joinpath('figures')
+
+data_path = path.joinpath('models', 'left_ventricle', '68')
+electrodes_path = path.joinpath('models', 'left_ventricle', '68')
+
+data_loader = DataLoader(electrodes_path=electrodes_path, data_path=data_path)
+
+base_data = SurfaceData(ptp=1, lat=1)
+lat_reference = 13
+fs = 1 / (40 * 0.0015)
 
 lines = []
-fig, axs = plt.subplots(ncols=3, sharex=True, sharey=False , figsize=(8, 3))
+fig, axs = plt.subplots(ncols=3, sharex=True, sharey=False, figsize=(8, 3))
 
 for surface in ['endo', 'epi']:
-    active_segments = np.load(path.joinpath(experiment, '0', 'labels.npy'))
+    data_loader.surface_name = surface
 
-    data_updater = ElectrodesDataUpdater(path.joinpath(experiment), surface, lat_reference=0.78)
+    residuals = Residuals(data_loader, lat_reference, fs, interpolate=False)
+    residuals.base_data = base_data
+    residuals.update_target('0')
 
-    els_data_target = copy.deepcopy(data_updater.update(0, fs=1 / (40 * 0.0015)))
     lat_array = []
     ptp_array = []
-    for j in range(1, subdir + 1):
-        els_data = data_updater.update(j, fs=1 / (40 * 0.0015))
-        els_data = els_data_target - els_data
+    for j in range(1,  203):
+        subdir = '{}'.format(j)
+        els_data = residuals.update(subdir)
 
         lat_array.append(els_data.lat)
-        ptp_array.append(els_data.amplitude)
+        ptp_array.append(els_data.ptp)
 
     lat_array = - np.array(lat_array)
     ptp_array = np.array(ptp_array)
@@ -73,13 +85,12 @@ axs[1].set_yticklabels([0.05, '0.20', '0.80', '3.20'])
 axs[2].set_ylim([2, 350])
 axs[2].set_yticks([5, 20, 80, 320])
 axs[2].set_yticklabels([5, 20, 80, 320])
-    
+
 for i, label in enumerate(['(a)', '(b)', '(c)']):
     axs[i].text(0.5, -0.35, label, transform=axs[i].transAxes,
-                    ha='center', va='center', fontdict=font_properties)
-    
+                ha='center', va='center', fontdict=font_properties)
+
 plt.tight_layout(pad=0.1, h_pad=0.1, w_pad=0.8)
 plt.subplots_adjust(top=0.98, bottom=0.3, right=0.98, left=0.1)
 # fig.savefig(path_save.joinpath('lv_convergence.png'), dpi=300)
 plt.show()
-

@@ -1,34 +1,40 @@
 from pathlib import Path
 import numpy as np
 
-from fibrosisoptimization.measure.residuals import Residuals
 from fibrosisoptimization.plotter.interactive_plotter import InteractivePlotter
+from fibrosisoptimization.measure.data_loader import DataLoader
 
 
-path = Path('./data')
-path_step = path.joinpath('17')
+path = Path('/Users/arstanbek/Projects/FibrosisOptimization/data/models')
 
-subdir = '1'
+model_dir = '68'
 
-surface_residuals = Residuals(path_step, 'epi', 13, fs=1 / (40 * 0.0015))
-surface_residuals.update_base('1')
-surface_residuals.update_target('0')
-surface_data = surface_residuals.update(subdir)
+layers_path = path
+segments_path = path.joinpath('left_ventricle', model_dir)
+electrodes_path = path.joinpath('left_ventricle', model_dir)
+data_path = path.joinpath('left_ventricle', model_dir)
 
-# scalar_lim = [np.min(surface_data.lat), np.max(surface_data.lat)]
-scalar_lim = [0, 18]
+data_loader = DataLoader(surface_name='endo',
+                         data_path=data_path,
+                         electrodes_path=electrodes_path,
+                         segments_path=segments_path,
+                         layers_path=layers_path)
 
-segments = np.load(path_step.joinpath('segments.npy'))
+surface_coords, surface_labels = data_loader.load_surface()
+electrodes_coords, electrodes_labels = data_loader.load_electrodes()
+segments = data_loader.load_segments()
 
-coords = np.vstack((np.argwhere(segments > 0), surface_data.coords))
+coords = np.vstack((np.argwhere(segments > 0), surface_coords))
 
 print(coords.shape)
-segments = np.concatenate((segments[segments > 0], surface_data.segments))
+segments = np.concatenate((segments[segments > 0], surface_labels))
 print(segments.shape)
+scalar_lim = (0, 68)
 
 plotter = InteractivePlotter()
 plotter.build_grid(coords)
 plotter.add_scalar(segments.astype(np.float32))
 plotter.add_grid(clim=scalar_lim)
+plotter.add_sphere_points(electrodes_coords, electrodes_labels)
 # plotter.update()
 plotter.show()

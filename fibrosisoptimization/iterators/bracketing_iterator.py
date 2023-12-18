@@ -8,13 +8,13 @@ class BracketingIterator(Iterator):
     Attributes
     ----------
     x_lower : float
-    Lower boundary of the bracketed range.
+        Lower boundary of the bracketed range.
     x_upper : float
-    Upper boundary of the bracketed range.
+        Upper boundary of the bracketed range.
     y_lower : float
-    Value at the lower boundary.
+        Value at the lower boundary.
     y_upper : float
-    Value at the upper boundary.
+        Value at the upper boundary.
     """
 
     def __init__(self):

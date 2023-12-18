@@ -3,8 +3,9 @@ import numpy as np
 from fibropt.vtktools.vtk_mesh_builder import VTKMeshBuilder
 
 
-path = Path('./data')
-path_save = Path('./data/vtk/')
+path = Path('/Users/arstanbek/Projects/FibrosisOptimization/data')
+path_save = path.joinpath('vtk')
+
 experiment = 'odf_frames'
 subdirs = ['initial']
 frame_inds = list(range(30))
@@ -33,4 +34,4 @@ for subdir in subdirs:
         builder.add_scalar(scalars, '{}_{}'.format(subdir, ind))
 
 builder.add_vertexes()
-builder.write(str(path_save.joinpath('arrhythmia_{}.vtk'.format(experiment))))
+# builder.write(str(path_save.joinpath('arrhythmia_{}.vtk'.format(experiment))))
