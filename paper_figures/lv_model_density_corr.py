@@ -47,7 +47,7 @@ def plot_regress(ax, x, y):
     ax.set_ylim([0, 40])
 
 
-path = Path('/Users/arstanbek/Projects/FibrosisOptimization/data')
+path = Path(__file__).parent.parent.joinpath('data')
 
 subdirs = ['0', '202']
 experiment = 'left_ventricle/68'

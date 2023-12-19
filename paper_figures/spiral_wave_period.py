@@ -14,7 +14,10 @@ mpl.rcParams['axes.titlesize'] = 'medium'
 mpl.rcParams['xtick.minor.size'] = 1
 mpl.rcParams['ytick.minor.size'] = 1
 
-font_properties = {'family': 'serif', 'color':  'black', 'weight': 'normal', 'size': 12}
+font_properties = {'family': 'serif', 
+                   'color':  'black', 
+                   'weight': 'normal', 
+                   'size': 12}
 
 path = Path('/Users/arstanbek/Thor/projects/fibrosisoptimization/data')
 path_save = Path('/Users/arstanbek/Projects/fibrosis-workspace/fibrosisoptimization/data/figures')

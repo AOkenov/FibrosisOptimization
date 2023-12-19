@@ -14,7 +14,8 @@ from fibrosisoptimization.minimizators import (
 from simulations import run_simulation
 
 
-path = Path('./data/models')
+path = Path(__file__).parent.parent.joinpath('data')
+path = path.joinpath('models')
 model_dir = 'left_ventricle'
 model_subdir = 'LV'
 data_path = path.joinpath(model_dir, model_subdir)

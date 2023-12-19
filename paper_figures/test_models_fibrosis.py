@@ -45,7 +45,7 @@ def select_frame(mesh):
     return image
 
 
-path = Path('/Users/arstanbek/Projects/FibrosisOptimization/data')
+path = Path(__file__).parent.parent.joinpath('data')
 path_save = path.joinpath('figures')
 data_path = path.joinpath('models', 'test_models')
 models = ['transmural', 'sub-endo', 'mid-wall', 'sub-epi']

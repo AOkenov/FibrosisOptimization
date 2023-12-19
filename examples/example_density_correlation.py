@@ -2,22 +2,25 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 
-from fibrosisoptimization.measure.fibrosis_density import FibrosisDensity
+from fibrosisoptimization.measure.data_loader import DataLoader
+from fibrosisoptimization.measure.fibrosis_measurer import FibrosisMeasurer
 
 
-path = Path('./data')
-path_step = path.joinpath('17')
+path = Path(__file__).parent.parent.joinpath('data')
+data_path = path.joinpath('models', 'left_ventricle', '17')
+segments_path = data_path
 
 subdir_x = '0'
 subdir_y = '7'
 
-segments = np.load(path_step.joinpath('segments.npy'))
+data_loader = DataLoader(data_path=data_path, segments_path=segments_path)
 
+segments = data_loader.load_segments()
 densities = {}
 
 for subdir in [subdir_x, subdir_y]:
-    mesh = np.load(path_step.joinpath(subdir, 'tissue.npy'))
-    densities[subdir] = FibrosisDensity.compute_density(mesh, segments)
+    mesh = data_loader.load_mesh(subdir)
+    densities[subdir] = FibrosisMeasurer.compute_density(mesh, segments)
 
 x = densities[subdir_x]
 y = densities[subdir_y]

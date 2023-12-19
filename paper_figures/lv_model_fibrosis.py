@@ -53,7 +53,7 @@ def plot_map(ax, image, vmin=0, vmax=50, cmap='YlOrBr'):
     ax.set_yticks([])
 
 
-path = Path('/Users/arstanbek/Projects/FibrosisOptimization/data')
+path = Path(__file__).parent.parent.joinpath('data')
 path_save = path.joinpath('figures')
 
 data_path = path.joinpath('models', 'left_ventricle', '68')

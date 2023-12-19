@@ -9,12 +9,9 @@ from fibrosisoptimization.measure import (
 from fibrosisoptimization.plotter.interactive_plotter import InteractivePlotter
 
 
-path = Path('./data/models')
-model_dir = 'test_models'
-model_subdir = 'mid-wall'
-
-data_path = path.joinpath(model_dir, model_subdir)
-segments_path = path.joinpath(model_dir)
+path = Path(__file__).parent.parent.parent.joinpath('data')
+data_path = path.joinpath('models', 'test_models', 'mid-wall')
+electrode_path = path.joinpath('models', 'left_ventricle', '17')
 
 surface_name = 'epi'
 lat_reference = 13
@@ -24,9 +21,7 @@ subdir = '1'
 
 data_loader = DataLoader(surface_name=surface_name,
                          data_path=data_path,
-                         electrodes_path=path,
-                         segments_path=segments_path,
-                         layers_path=path)
+                         electrodes_path=electrode_path)
 
 
 surface_residuals = Residuals(data_loader, lat_reference, fs, interpolate=True)

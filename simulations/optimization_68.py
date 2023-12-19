@@ -18,7 +18,8 @@ distant_segments = [[1, 3, 5, 14, 16],
                     [8, 10, 12, 17]]
 
 
-path = Path('./data/models')
+path = Path(__file__).parent.parent.joinpath('data')
+path = path.joinpath('models')
 model_dir = 'left_ventricle'
 model_subdir = '68'
 data_path = path.joinpath(model_dir, model_subdir)

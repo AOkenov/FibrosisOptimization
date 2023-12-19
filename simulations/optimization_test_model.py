@@ -15,7 +15,8 @@ from fibrosisoptimization.minimizators import (
 
 from run_simulation import run_simulation
 
-path = Path('./data/models')
+path = Path(__file__).parent.parent.joinpath('data')
+path = path.joinpath('models')
 model_dir = 'test_models'
 model_subdir = 'sub-epi'
 

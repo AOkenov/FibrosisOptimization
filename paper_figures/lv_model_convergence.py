@@ -23,7 +23,7 @@ font_properties = {'family': 'serif',
                    'weight': 'normal',
                    'size': 12}
 
-path = Path('/Users/arstanbek/Projects/FibrosisOptimization/data')
+path = Path(__file__).parent.parent.joinpath('data')
 path_save = path.joinpath('figures')
 
 data_path = path.joinpath('models', 'left_ventricle', '68')

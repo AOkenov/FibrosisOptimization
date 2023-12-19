@@ -2,20 +2,28 @@ from pathlib import Path
 import numpy as np
 
 from fibrosisoptimization.measure.residuals import Residuals
+from fibrosisoptimization.measure.data_loader import DataLoader
 from fibrosisoptimization.plotter.interactive_plotter import InteractivePlotter
 
 
-path = Path('./data')
-path_step = path.joinpath('LV')
+path = Path(__file__).parent.parent.joinpath('data')
+data_path = path.joinpath('models', 'left_ventricle', 'LV')
 
 subdir = '1'
+lat_reference = 13
+fs = 1 / (40 * 0.0015)
 
-surface_residuals = Residuals(path_step, 'epi', 13, fs=1 / (40 * 0.0015))
+data_loader = DataLoader(surface_name='epi', 
+                         electrodes_path=data_path,
+                         data_path=data_path, 
+                         segments_path=data_path)
+
+surface_residuals = Residuals(data_loader, lat_reference, fs, interpolate=True)
 surface_residuals.update_base('1')
 surface_residuals.update_target('0')
 surface_data = surface_residuals.update(subdir)
 
-electrode_residuals = Residuals(path_step, 'epi', 13, fs=1 / (40 * 0.0015),
+electrode_residuals = Residuals(data_loader, lat_reference, fs, 
                                 interpolate=False)
 electrode_residuals.update_base('1')
 electrode_residuals.update_target('0')

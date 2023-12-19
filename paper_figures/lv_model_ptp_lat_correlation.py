@@ -40,7 +40,7 @@ def plot_regress(ax, x, y):
     ax.legend(loc='upper left')
 
 
-path = Path('/Users/arstanbek/Projects/FibrosisOptimization/data')
+path = Path(__file__).parent.parent.joinpath('data')
 data_path = path.joinpath('models', 'left_ventricle', '68')
 electrodes_path = path.joinpath('models', 'left_ventricle', '68')
 

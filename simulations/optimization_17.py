@@ -29,8 +29,8 @@ def sort_distant_segments(lats):
 
     return res
 
-
-path = Path('./data/models')
+path = Path(__file__).parent.parent.joinpath('data')
+path = path.joinpath('models')
 model_dir = 'left_ventricle'
 model_subdir = '17'
 data_path = path.joinpath(model_dir, model_subdir)
